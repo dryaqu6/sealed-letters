@@ -1,0 +1,929 @@
+<title>Sealed</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink-void: #17130f;
+    --ink-desk: #211b15;
+    --ink-card: #2a231b;
+    --ink-card-2: #332b21;
+    --paper: #ece0c8;
+    --paper-dim: #cabb98;
+    --brass: #b2905b;
+    --brass-dim: #7d6841;
+    --wax: #8c3b2e;
+    --wax-bright: #b04a37;
+    --wax-shadow: #5c2419;
+    --line: #4a4033;
+    --danger: #c1584a;
+    --ok: #7fa06a;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --ink-void: #ece4d2;
+      --ink-desk: #f4eeda;
+      --ink-card: #fbf6e8;
+      --ink-card-2: #f1e8d2;
+      --paper: #2c2013;
+      --paper-dim: #6b5a3d;
+      --brass: #8a6a34;
+      --brass-dim: #b79a63;
+      --wax: #8c3b2e;
+      --wax-bright: #a3402f;
+      --wax-shadow: #6b2a20;
+      --line: #d8c9a5;
+      --danger: #a5382a;
+      --ok: #5c7c47;
+    }
+  }
+  :root[data-theme="light"] {
+    --ink-void: #ece4d2;
+    --ink-desk: #f4eeda;
+    --ink-card: #fbf6e8;
+    --ink-card-2: #f1e8d2;
+    --paper: #2c2013;
+    --paper-dim: #6b5a3d;
+    --brass: #8a6a34;
+    --brass-dim: #b79a63;
+    --wax: #8c3b2e;
+    --wax-bright: #a3402f;
+    --wax-shadow: #6b2a20;
+    --line: #d8c9a5;
+    --danger: #a5382a;
+    --ok: #5c7c47;
+  }
+  :root[data-theme="dark"] {
+    --ink-void: #17130f;
+    --ink-desk: #211b15;
+    --ink-card: #2a231b;
+    --ink-card-2: #332b21;
+    --paper: #ece0c8;
+    --paper-dim: #cabb98;
+    --brass: #b2905b;
+    --brass-dim: #7d6841;
+    --wax: #8c3b2e;
+    --wax-bright: #b04a37;
+    --wax-shadow: #5c2419;
+    --line: #4a4033;
+    --danger: #c1584a;
+    --ok: #7fa06a;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse 900px 500px at 20% -10%, color-mix(in srgb, var(--brass) 10%, transparent), transparent 60%),
+      var(--ink-void);
+    color: var(--paper);
+    font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    min-height: 100vh;
+  }
+
+  .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; }
+
+  a { color: inherit; }
+
+  ::selection { background: var(--wax); color: var(--ink-card); }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header.top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .brand .mark {
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.55rem;
+    letter-spacing: 0.01em;
+    color: var(--paper);
+  }
+  .brand .mark::before {
+    content: "✒";
+    color: var(--brass);
+    margin-right: 8px;
+    font-size: 1.1rem;
+  }
+  .brand .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+  }
+
+  nav.tabs {
+    display: inline-flex;
+    gap: 4px;
+    background: var(--ink-card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px;
+  }
+  nav.tabs button {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: transparent;
+    border: none;
+    color: var(--paper-dim);
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  nav.tabs button.active {
+    background: var(--wax);
+    color: #f4e9da;
+  }
+  nav.tabs button:not(.active):hover {
+    color: var(--paper);
+  }
+
+  section.view { display: none; }
+  section.view.active { display: block; animation: rise 0.4s ease; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h1.title {
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    font-weight: 500;
+    font-style: italic;
+    margin: 0 0 6px;
+    text-wrap: balance;
+    color: var(--paper);
+  }
+  p.sub {
+    margin: 0 0 32px;
+    color: var(--paper-dim);
+    font-size: 1.05rem;
+    max-width: 52ch;
+  }
+
+  .card {
+    background: var(--ink-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px;
+  }
+  .card + .card { margin-top: 20px; }
+
+  label {
+    display: block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 8px;
+  }
+  .field { margin-bottom: 22px; }
+  .field:last-child { margin-bottom: 0; }
+  .hint {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--paper-dim);
+    margin-top: 7px;
+    line-height: 1.5;
+  }
+
+  input[type="text"], input[type="password"], textarea {
+    width: 100%;
+    background: var(--ink-card-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--paper);
+    font-family: "Cormorant Garamond", serif;
+    font-size: 1.15rem;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input.mono, textarea.mono {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.95rem;
+  }
+  textarea {
+    min-height: 220px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+  input:focus, textarea:focus {
+    border-color: var(--brass);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brass) 22%, transparent);
+  }
+  input::placeholder, textarea::placeholder { color: var(--paper-dim); opacity: 0.55; }
+
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row > .field { flex: 1 1 220px; }
+
+  .pwrow { display: flex; gap: 10px; align-items: stretch; }
+  .pwrow input { flex: 1; }
+  button.ghost {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--ink-card-2);
+    border: 1px solid var(--line);
+    color: var(--paper-dim);
+    padding: 0 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  button.ghost:hover { border-color: var(--brass); color: var(--brass); }
+
+  button.primary {
+    width: 100%;
+    margin-top: 26px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--wax);
+    color: #f6ece0;
+    border: 1px solid var(--wax-shadow);
+    border-radius: 9px;
+    padding: 15px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  button.primary:hover { background: var(--wax-bright); }
+  button.primary:active { transform: scale(0.995); }
+  button.primary:disabled {
+    background: var(--ink-card-2);
+    color: var(--paper-dim);
+    border-color: var(--line);
+    cursor: not-allowed;
+  }
+
+  .strength {
+    display: flex;
+    gap: 5px;
+    margin-top: 9px;
+  }
+  .strength i {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--line);
+  }
+  .strength i.on0 { background: var(--danger); }
+  .strength i.on1 { background: #c98a4a; }
+  .strength i.on2 { background: #b2a04a; }
+  .strength i.on3 { background: var(--ok); }
+
+  /* --- result / share --- */
+  .result {
+    display: none;
+  }
+  .result.show { display: block; animation: rise 0.4s ease; }
+  .seal-mini {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, var(--wax-bright), var(--wax) 60%, var(--wax-shadow) 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #f3e6d8;
+    font-size: 0.8rem;
+    flex: none;
+  }
+  .link-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--ink-card-2);
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 6px;
+  }
+  .link-box .url {
+    flex: 1;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.82rem;
+    color: var(--brass);
+    word-break: break-all;
+  }
+  .callout {
+    font-size: 0.92rem;
+    color: var(--paper-dim);
+    margin-top: 18px;
+    line-height: 1.6;
+    border-left: 2px solid var(--wax);
+    padding-left: 14px;
+  }
+  .callout strong { color: var(--paper); font-weight: 600; }
+
+  /* --- read view --- */
+  .id-lookup {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .id-lookup input { flex: 1; }
+  .id-lookup button {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--ink-card-2);
+    border: 1px solid var(--line);
+    color: var(--brass);
+    padding: 0 20px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .id-lookup button:hover { border-color: var(--brass); }
+
+  .envelope-stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 46px 20px 30px;
+  }
+  .envelope {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 15 / 10;
+    background: linear-gradient(155deg, var(--ink-card-2), var(--ink-card));
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 24px 50px -20px rgba(0,0,0,0.55);
+  }
+  .envelope::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, transparent 49.3%, var(--line) 49.6%, var(--line) 50.4%, transparent 50.7%),
+      linear-gradient(45deg, transparent 49.3%, var(--line) 49.6%, var(--line) 50.4%, transparent 50.7%);
+    background-size: 100% 62%, 100% 62%;
+    background-position: top, top;
+    background-repeat: no-repeat;
+    opacity: 0.7;
+    border-radius: 10px;
+  }
+  .seal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, var(--wax-bright), var(--wax) 55%, var(--wax-shadow) 100%);
+    box-shadow: 0 10px 18px -6px rgba(0,0,0,0.6), inset 0 -4px 8px rgba(0,0,0,0.35), inset 0 3px 6px rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    transition: transform 0.25s ease;
+  }
+  .seal .glyph {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: #f3ddc9;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+  }
+  .seal.crack { animation: crack 0.5s ease forwards; }
+  @keyframes crack {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    35% { transform: translate(-50%, -50%) scale(1.08) rotate(-3deg); }
+    100% { transform: translate(-50%, -50%) scale(0) rotate(12deg); opacity: 0; }
+  }
+
+  .unlock-panel {
+    width: 100%;
+    max-width: 340px;
+    margin-top: 34px;
+  }
+  .unlock-panel .pwrow input { text-align: center; letter-spacing: 0.08em; }
+  .lookup-meta {
+    text-align: center;
+    margin-top: 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--paper-dim);
+  }
+  .error-msg {
+    display: none;
+    text-align: center;
+    color: var(--danger);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.78rem;
+    margin-top: 12px;
+  }
+  .error-msg.show { display: block; }
+
+  .letter-paper {
+    display: none;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    background: var(--paper);
+    color: #2a2013;
+    border-radius: 4px;
+    padding: 44px 40px 36px;
+    box-shadow: 0 30px 60px -24px rgba(0,0,0,0.6);
+    position: relative;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 33px,
+      rgba(42,32,19,0.10) 34px
+    );
+  }
+  .letter-paper.show { display: block; animation: unfold 0.55s cubic-bezier(.2,.8,.2,1); }
+  @keyframes unfold {
+    from { opacity: 0; transform: translateY(14px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .letter-paper .from {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7d6841;
+    margin-bottom: 18px;
+  }
+  .letter-paper .body-text {
+    font-size: 1.28rem;
+    line-height: 1.85;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 3em;
+  }
+  .letter-paper .sign {
+    margin-top: 30px;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: #5c4a2a;
+    text-align: right;
+  }
+
+  .back-link {
+    display: none;
+    margin-top: 22px;
+    text-align: center;
+  }
+  .back-link.show { display: block; }
+  .back-link button {
+    background: none;
+    border: none;
+    color: var(--brass-dim);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .back-link button:hover { color: var(--brass); }
+
+  footer.foot {
+    margin-top: 56px;
+    text-align: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+    opacity: 0.6;
+  }
+
+  .link-len {
+    margin-top: 8px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    color: var(--paper-dim);
+    opacity: 0.75;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="mark">Sealed</span>
+      <span class="tag">letters, kept shut</span>
+    </div>
+    <nav class="tabs">
+      <button type="button" class="active" data-tab="write">Viết thư</button>
+      <button type="button" data-tab="read">Đọc thư</button>
+    </nav>
+  </header>
+
+  <!-- WRITE -->
+  <section class="view active" id="view-write">
+    <h1 class="title">Niêm một bức thư</h1>
+    <p class="sub">Viết điều bạn muốn gửi, đặt một mật khẩu để niêm phong nó, rồi chia sẻ đường dẫn — chỉ ai biết mật khẩu mới bóc được con dấu.</p>
+
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label for="w-to">Gửi đến</label>
+          <input type="text" id="w-to" placeholder="ví dụ: Ngọc, tương lai của tớ, bạn...">
+        </div>
+        <div class="field">
+          <label for="w-from">Từ</label>
+          <input type="text" id="w-from" placeholder="tên của bạn (có thể để trống)">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="w-body">Nội dung thư</label>
+        <textarea id="w-body" placeholder="Viết bất cứ điều gì bạn muốn giữ lại cho đúng người, đúng lúc..."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="w-pass">Mật khẩu niêm phong</label>
+        <div class="pwrow">
+          <input type="text" class="mono" id="w-pass" placeholder="đặt một mật khẩu bất kỳ">
+          <button type="button" class="ghost" id="w-gen">tạo ngẫu nhiên</button>
+        </div>
+        <div class="strength" id="w-strength">
+          <i></i><i></i><i></i><i></i>
+        </div>
+        <div class="hint">Người đọc phải nhập đúng mật khẩu này để bóc thư. Nội dung được mã hoá bằng chính mật khẩu — hãy gửi nó qua một kênh khác với đường link.</div>
+      </div>
+
+      <button type="button" class="primary" id="w-submit">Niêm phong &amp; tạo đường dẫn</button>
+    </div>
+
+    <div class="card result" id="w-result">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <span class="seal-mini">✦</span>
+        <div>
+          <div style="font-style:italic; font-size:1.15rem;">Thư đã được niêm phong.</div>
+        </div>
+      </div>
+      <label>Đường dẫn thư</label>
+      <div class="link-box">
+        <span class="url mono" id="w-url">—</span>
+        <button type="button" class="ghost" id="w-copy">copy</button>
+      </div>
+      <div class="link-len" id="w-len"></div>
+      <div class="callout">
+        Toàn bộ thư (đã mã hoá) nằm ngay trong đường dẫn này — không lưu ở đâu khác, ai có link đều mở được trang, không cần đăng nhập gì. Gửi link cho <strong id="w-result-to">người nhận</strong>, và gửi <strong>mật khẩu</strong> qua một kênh riêng (tin nhắn, gặp trực tiếp...). Ai có cả hai mới đọc được thư.
+      </div>
+    </div>
+  </section>
+
+  <!-- READ -->
+  <section class="view" id="view-read">
+    <h1 class="title">Bóc một bức thư</h1>
+    <p class="sub">Dán đường dẫn đầy đủ bạn nhận được (hoặc chỉ phần mã sau dấu #), rồi nhập mật khẩu để phá dấu niêm phong.</p>
+
+    <div class="id-lookup">
+      <input type="text" class="mono" id="r-id" placeholder="dán link đầy đủ hoặc mã thư vào đây">
+      <button type="button" id="r-open">Mở</button>
+    </div>
+
+    <div class="envelope-stage" id="r-stage" style="display:none;">
+      <div class="envelope" id="r-envelope">
+        <div class="seal" id="r-seal"><span class="glyph">§</span></div>
+      </div>
+
+      <div class="unlock-panel" id="r-unlock">
+        <label for="r-pass">Mật khẩu</label>
+        <div class="pwrow">
+          <input type="password" class="mono" id="r-pass" placeholder="••••••••">
+          <button type="button" class="ghost" id="r-toggle">hiện</button>
+        </div>
+        <button type="button" class="primary" id="r-submit">Phá dấu niêm phong</button>
+        <div class="error-msg" id="r-error">Mật khẩu không đúng. Thử lại.</div>
+        <div class="lookup-meta" id="r-meta"></div>
+      </div>
+
+      <div class="letter-paper" id="r-letter">
+        <div class="from" id="r-letter-meta">TỪ —</div>
+        <div class="body-text" id="r-letter-body"></div>
+        <div class="sign" id="r-letter-sign"></div>
+      </div>
+
+      <div class="back-link" id="r-back">
+        <button type="button" id="r-reset">← đọc một thư khác</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">mỗi bức thư một dấu niêm riêng — không mật khẩu, không mở được</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- bytes <-> base64url ----------
+  function b64urlFromBytes(bytes) {
+    var bin = "";
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function bytesFromB64url(b64url) {
+    var b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  // ---------- gzip compress/decompress (native CompressionStream) ----------
+  async function gzipBytes(bytes) {
+    if (typeof CompressionStream === "undefined") return bytes;
+    var cs = new CompressionStream("gzip");
+    var writer = cs.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    var buf = await new Response(cs.readable).arrayBuffer();
+    return new Uint8Array(buf);
+  }
+  async function gunzipBytes(bytes) {
+    if (typeof DecompressionStream === "undefined") return bytes;
+    var ds = new DecompressionStream("gzip");
+    var writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    var buf = await new Response(ds.readable).arrayBuffer();
+    return new Uint8Array(buf);
+  }
+
+  async function deriveKey(password, saltBytes) {
+    var enc = new TextEncoder();
+    var baseKey = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: saltBytes, iterations: 150000, hash: "SHA-256" },
+      baseKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt", "decrypt"]
+    );
+  }
+
+  // Packs {to, from, body} into one self-contained, URL-safe token:
+  // salt(16) + iv(12) + gzip(ciphertext-of-json), all base64url, no server involved.
+  async function sealLetter(password, letterObj) {
+    var salt = crypto.getRandomValues(new Uint8Array(16));
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    var key = await deriveKey(password, salt);
+    var enc = new TextEncoder();
+    var json = JSON.stringify(letterObj);
+    var compressed = await gzipBytes(enc.encode(json));
+    var cipherBuf = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, compressed);
+    var cipherBytes = new Uint8Array(cipherBuf);
+
+    var packed = new Uint8Array(salt.length + iv.length + cipherBytes.length);
+    packed.set(salt, 0);
+    packed.set(iv, salt.length);
+    packed.set(cipherBytes, salt.length + iv.length);
+    return b64urlFromBytes(packed);
+  }
+
+  async function openLetterToken(password, token) {
+    var packed = bytesFromB64url(token);
+    var salt = packed.slice(0, 16);
+    var iv = packed.slice(16, 28);
+    var cipherBytes = packed.slice(28);
+    var key = await deriveKey(password, salt);
+    var plainBuf = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, cipherBytes);
+    var decompressed = await gunzipBytes(new Uint8Array(plainBuf));
+    var json = new TextDecoder().decode(decompressed);
+    return JSON.parse(json);
+  }
+
+  function randomPassword() {
+    var words = ["ember","willow","quartz","linen","cedar","amber","brook","lark","moss","tide","opal","fern","vale","dune","glow","reed"];
+    var pick = function (arr) { return arr[Math.floor(Math.random() * arr.length)]; };
+    var num = Math.floor(10 + Math.random() * 89);
+    return pick(words) + "-" + pick(words) + "-" + num;
+  }
+
+  function scoreStrength(pw) {
+    var score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 10) score++;
+    if (/[0-9]/.test(pw) && /[a-zA-Z]/.test(pw)) score++;
+    if (pw.length >= 14 || /[^a-zA-Z0-9]/.test(pw)) score++;
+    return Math.min(score, 4);
+  }
+
+  // ---------- tabs ----------
+  var tabButtons = document.querySelectorAll("nav.tabs button");
+  var views = {
+    write: document.getElementById("view-write"),
+    read: document.getElementById("view-read")
+  };
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      tabButtons.forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      Object.keys(views).forEach(function (k) { views[k].classList.remove("active"); });
+      views[btn.dataset.tab].classList.add("active");
+    });
+  });
+
+  // ---------- write view ----------
+  var wPass = document.getElementById("w-pass");
+  var wStrength = document.getElementById("w-strength");
+  wPass.addEventListener("input", function () {
+    var s = scoreStrength(wPass.value);
+    wStrength.querySelectorAll("i").forEach(function (el, idx) {
+      el.className = idx < s ? "on" + (s - 1) : "";
+    });
+  });
+
+  document.getElementById("w-gen").addEventListener("click", function () {
+    wPass.value = randomPassword();
+    wPass.dispatchEvent(new Event("input"));
+  });
+
+  document.getElementById("w-copy").addEventListener("click", function () {
+    var url = document.getElementById("w-url").textContent;
+    navigator.clipboard.writeText(url).catch(function () {});
+    var btn = document.getElementById("w-copy");
+    var old = btn.textContent;
+    btn.textContent = "copied";
+    setTimeout(function () { btn.textContent = old; }, 1400);
+  });
+
+  document.getElementById("w-submit").addEventListener("click", async function () {
+    var to = document.getElementById("w-to").value.trim();
+    var from = document.getElementById("w-from").value.trim();
+    var body = document.getElementById("w-body").value;
+    var pass = wPass.value;
+    var btn = this;
+
+    if (!body.trim()) { document.getElementById("w-body").focus(); return; }
+    if (!pass) { wPass.focus(); return; }
+
+    btn.disabled = true;
+    btn.textContent = "đang niêm phong...";
+
+    try {
+      var token = await sealLetter(pass, {
+        to: to || null,
+        from: from || null,
+        body: body,
+        createdAt: new Date().toISOString()
+      });
+
+      var url = location.origin + location.pathname + "#" + token;
+      document.getElementById("w-url").textContent = url;
+      document.getElementById("w-len").textContent = url.length + " ký tự · không lưu ở server nào, chỉ nằm trong link này";
+      document.getElementById("w-result-to").textContent = to || "người nhận";
+      document.getElementById("w-result").classList.add("show");
+      document.getElementById("w-result").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch (err) {
+      alert("Không thể niêm phong thư lúc này. Thử lại sau.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Niêm phong & tạo đường dẫn";
+    }
+  });
+
+  // ---------- read view ----------
+  var currentToken = null;
+
+  function extractToken(raw) {
+    raw = raw.trim();
+    if (!raw) return "";
+    var hashIdx = raw.indexOf("#");
+    if (hashIdx !== -1) return raw.slice(hashIdx + 1).trim();
+    return raw;
+  }
+
+  function openLetter(token) {
+    var stage = document.getElementById("r-stage");
+    var meta = document.getElementById("r-meta");
+    document.getElementById("r-error").classList.remove("show");
+    document.getElementById("r-letter").classList.remove("show");
+    document.getElementById("r-back").classList.remove("show");
+    document.getElementById("r-unlock").style.display = "block";
+    var seal = document.getElementById("r-seal");
+    seal.className = "seal";
+    stage.style.display = "flex";
+
+    if (!token) {
+      meta.textContent = "Đường dẫn không hợp lệ.";
+      document.getElementById("r-unlock").style.display = "none";
+      return;
+    }
+
+    currentToken = token;
+    meta.textContent = "một bức thư đang chờ được bóc";
+    document.getElementById("r-pass").value = "";
+    document.getElementById("r-pass").focus();
+  }
+
+  document.getElementById("r-open").addEventListener("click", function () {
+    var token = extractToken(document.getElementById("r-id").value);
+    if (token) openLetter(token);
+  });
+  document.getElementById("r-id").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("r-open").click();
+  });
+
+  document.getElementById("r-toggle").addEventListener("click", function () {
+    var input = document.getElementById("r-pass");
+    var show = input.type === "password";
+    input.type = show ? "text" : "password";
+    this.textContent = show ? "ẩn" : "hiện";
+  });
+
+  async function tryUnlock() {
+    if (!currentToken) return;
+    var pass = document.getElementById("r-pass").value;
+    var errEl = document.getElementById("r-error");
+    errEl.classList.remove("show");
+    if (!pass) return;
+
+    var btn = document.getElementById("r-submit");
+    btn.disabled = true;
+    btn.textContent = "đang thử...";
+
+    try {
+      var letter = await openLetterToken(pass, currentToken);
+      var seal = document.getElementById("r-seal");
+      seal.classList.add("crack");
+
+      setTimeout(function () {
+        document.getElementById("r-unlock").style.display = "none";
+        var letterEl = document.getElementById("r-letter");
+        document.getElementById("r-letter-meta").textContent =
+          "TỪ " + (letter.from ? letter.from.toUpperCase() : "MỘT NGƯỜI GIẤU TÊN") +
+          (letter.to ? " · GỬI " + letter.to.toUpperCase() : "");
+        document.getElementById("r-letter-body").textContent = letter.body;
+        document.getElementById("r-letter-sign").textContent = letter.from ? "— " + letter.from : "";
+        letterEl.classList.add("show");
+        document.getElementById("r-back").classList.add("show");
+      }, 260);
+    } catch (err) {
+      errEl.classList.add("show");
+      document.getElementById("r-pass").focus();
+      document.getElementById("r-pass").select();
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Phá dấu niêm phong";
+    }
+  }
+
+  document.getElementById("r-submit").addEventListener("click", tryUnlock);
+  document.getElementById("r-pass").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") tryUnlock();
+  });
+
+  document.getElementById("r-reset").addEventListener("click", function () {
+    document.getElementById("r-stage").style.display = "none";
+    document.getElementById("r-id").value = "";
+    document.getElementById("r-id").focus();
+    currentToken = null;
+    history.replaceState(null, "", location.pathname + location.search);
+  });
+
+  // ---------- boot: read token straight from the URL, no server involved ----------
+  function boot() {
+    var hashToken = location.hash.replace(/^#/, "").trim();
+    if (hashToken) {
+      tabButtons.forEach(function (b) { b.classList.remove("active"); });
+      document.querySelector('nav.tabs button[data-tab="read"]').classList.add("active");
+      views.write.classList.remove("active");
+      views.read.classList.add("active");
+      document.getElementById("r-id").value = location.href;
+      openLetter(hashToken);
+    }
+  }
+  boot();
+})();
+</script>
